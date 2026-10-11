@@ -1,19 +1,19 @@
-# Rime + 小狼毫 + 雾凇 配置备份
+#requires -Version 7.0
+# Rime 备份：停机采集整份用户词库，校验 CURRENT 与清单。
+param(
+    [string]$SourceDirectory = (Join-Path $env:APPDATA 'Rime'),
+    [string]$Destination = (Join-Path $PSScriptRoot 'Backup' (Get-Date -Format 'yyyyMMdd-HHmmss-fffffff'))
+)
 
-$dest = Join-Path $PSScriptRoot "Backup" (Get-Date -Format "yyyyMMdd-HHmmss")
+$ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'scripts/config-common.ps1')
 
-Write-Host "=== Rime 配置备份 ===" -ForegroundColor Cyan
-Write-Host "→ $dest`n"
-Write-Host "建议先切换到其他输入法再备份" -ForegroundColor Yellow
+Assert-ApplicationStopped @('Weasel*')
+Assert-RequiredPaths $SourceDirectory @('default.custom.yaml', 'weasel.custom.yaml', 'rime_ice.schema.yaml')
+Assert-SeparatePaths $SourceDirectory $Destination
+Assert-LevelDbManifests $SourceDirectory
+New-BackupDirectory $Destination
+Copy-DirectoryContents $SourceDirectory (Join-Path $Destination 'rime') @('build', '.github', '.gitignore', 'rime-ice-main', 'LOCK', 'LOG', 'LOG.old')
+Assert-ApplicationStopped @('Weasel*')
+Complete-Backup $Destination
 
-$src = "$env:APPDATA\Rime"
-$dst = Join-Path $dest "rime"
-
-if (Test-Path $src) {
-    # 复制全部，排除编译缓存
-    Copy-Item $src -Destination $dst -Recurse -Force
-    Remove-Item "$dst\build" -Recurse -Force -ErrorAction SilentlyContinue
-    Write-Host "完成: $dst" -ForegroundColor Green
-}
-
-Write-Host "`n=== 备份完成 ===" -ForegroundColor Cyan
