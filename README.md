@@ -72,3 +72,11 @@ pwsh -NoProfile -File .\backup.ps1
 
 保留原来的 `installation_id`，不手动编辑数据库文件。重新部署会生成 `build/`，无需把它纳入备份。跨机使用前检查词频、自造词、输入方案及皮肤，而不能只看文件复制是否完成。
 
+
+## 私有迁移数据（2026-10-11）
+
+最新个人配置和状态存放在私有仓库 `64ty6/wezterm-yazi-nushell-starship` 的 `migration/data/
+rime-weasel
+`，本公开仓库保留脚本与可公开配置。完整恢复请参照私有仓库 `migration/README.md`，使用 `migration/restore-all.ps1`。单独调用此仓库的 `restore.ps1` 时，传入 `-Source <私有迁移快照目录>`。大型运行环境另存私有 Release 附件。
+
+旧个人数据在当前分支已移除；此前公开提交的历史不在本次重写范围内。
